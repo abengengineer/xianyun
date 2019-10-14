@@ -105,13 +105,8 @@ export default {
                 return;
             }
 
-            const res = await this.$axios({
-                url: "/captchas",
-                method: "POST",
-                data: {
-                    tel: this.form.username
-                }
-            })
+            // 调用异步actions的方法
+            const res = await this.$store.dispatch("user/sendCaptcha",this.form.username)
 
             const { code } = res.data;
             this.$message.success(`当前的手机验证码是:${ code }`)
