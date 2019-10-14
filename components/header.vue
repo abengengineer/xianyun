@@ -40,9 +40,27 @@
                 </el-dropdown>
 
                 <!-- 不存在用户信息展示登录注册链接 -->
-                <nuxt-link to="/user/login" class="account-link" v-else>
+                <nuxt-link 
+                to="/user/login" 
+                class="account-link" 
+                v-if="!$store.state.user.userInfo.token">
                     登录 / 注册 
                 </nuxt-link>
+
+                <el-dropdown v-else>
+                    <span class="el-dropdown-link">
+                        <!-- 头像 -->
+                        <img :src="$axios.defaults.baseURL + $store.state.user.userInfo.user.defaultAvatar" alt="">
+                        {{ $store.state.user.userInfo.user.nickname }}
+                        <i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>个人中心</el-dropdown-item>
+                        <el-dropdown-item>
+                            <span @click="handleLogout">退出</span>
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
             </el-row>
         </el-row>
     </header>
@@ -51,7 +69,10 @@
 export default {
     methods: {
         // 用户退出
-        handleLogout(){},
+        handleLogout(){
+            // 清空用户数据
+            this.$store.commit("user/setUserInfo",{})
+        },
     }
 }
 </script>

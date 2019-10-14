@@ -64,15 +64,13 @@ export default {
         }
     },
 
-    mounted(){
+    async mounted(){
         // 请求轮播图数据
-        this.$axios({
+        const res = await this.$axios({
             url: "/scenics/banners"
-        }).then(res =>{
-            const { data } = res.data;
-
-            this.banners = data;
         })
+        const { data } = res.data;
+        this.banners = data;
     },
 
     methods: {
