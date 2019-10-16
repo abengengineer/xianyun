@@ -92,11 +92,11 @@ export default {
         // tab切换时触发
         handleSearchTab(item, index) {
             // tab栏点击切换时候触发
-            if(index === 1){
+            if (index === 1) {
                 this.$alert("目前不支持往返功能", "提示", {
                     confirmButtonText: "确定",
                     type: "warning"
-                })
+                });
             }
         },
 
@@ -159,7 +159,7 @@ export default {
         // 目标城市下拉选择时触发
         handleDestSelect(item) {
             // 获取到表单需要的机票信息
-            this.form.departCity = item.value;
+            this.form.destCity = item.value;
             this.form.departCode = item.sort;
         },
 
@@ -170,7 +170,13 @@ export default {
 
         // 触发和目标城市切换时触发
         handleReverse() {
-            const { destCode,departDate,departCity,departCode,destCity } = this.form;
+            const {
+                destCode,
+                departDate,
+                departCity,
+                departCode,
+                destCity
+            } = this.form;
 
             this.form.departCity = destCity;
             this.form.departCode = destCode;
@@ -184,36 +190,46 @@ export default {
             // 自定义验证
             const rules = {
                 departCity: {
-                    message: "请输入出发城市", value: this.form.departCity
+                    message: "请输入出发城市",
+                    value: this.form.departCity
                 },
                 destCity: {
-                    message: "请输入到达城市", value: this.form.destCity
+                    message: "请输入到达城市",
+                    value: this.form.destCity
                 },
                 departDate: {
-                    message: "请输入出发时间", value: this.form.departDate
+                    message: "请输入出发时间",
+                    value: this.form.departDate
                 }
-            }
+            };
 
             // 循环rules对象，判断value如果是空的，打印错误信息
             let valid = true;
             Object.keys(rules).forEach(v => {
-                if(!valid) return;
-
+                // 只要有一次验证不通过，后台验证不用再执行
+                if (!valid) return;
                 const { message, value } = rules[v];
-                if(!value){
+                // 对象属性的value如果是空的
+                if (!value) {
                     this.$message.error(message);
+                    // 验证不通过
                     valid = false;
                 }
-            })
+            });
 
-            if(!vaild) return;
+            if (!valid) return;
             this.$router.push({
                 path: "/air/flights",
                 query: this.form
-            })
+            });
+
+            // 保存在store
+            this.$store.commit("air/setHistory",this.form)
         }
     },
-    mounted() {}
+    mounted(){
+
+    }
 };
 </script>
 
