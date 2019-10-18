@@ -189,7 +189,7 @@ export default {
                 text-align: center;
                 color:#666;
                 button{
-                    display: block;
+                    // display: block;
                     width:100%;
                     margin-bottom:5px;
                 }
