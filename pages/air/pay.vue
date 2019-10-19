@@ -1,9 +1,10 @@
+    
 <template>
     <div class="container">
         <div class="main">
             <div class="pay-title">
                 支付总金额
-                <span class="pay-price">￥ 1000</span>
+                <span class="pay-price">￥ {{ order.price }}</span>
             </div>
             <div class="pay-main">
                 <h4>微信支付</h4>
@@ -11,6 +12,7 @@
                     <div class="qrcode">
                         <!-- 二维码 -->
                         <canvas id="qrcode-stage"></canvas>
+
                         <p>请使用微信扫一扫</p>
                         <p>扫描二维码支付</p>
                     </div>
@@ -24,7 +26,69 @@
 </template>
 
 <script>
-export default {};
+// 导入第三方二维码生成插件
+import QRCode from "qrcode";
+
+export default {
+    data() {
+        return {
+            // 订单详情
+            order: {},
+            timer: null
+        };
+    },
+
+    mounted() {
+        // 订单id
+        const { id } = this.$route.query;
+
+        // 订单延时功能
+        setTimeout(async () => {
+            // 请求订单详情
+            const res = await this.$axios({
+                url: "/airorders/" + id,
+                headers: {
+                    Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
+                }
+            })
+            this.order = res.data;
+
+            // 获取第三方插件元素
+            const canvas = document.querySelector("#qrcode-stage");
+            QRCode.toCanvas(canvas, this.order.payInfo.code_url, {
+                width: 200
+            });
+
+            // 查询付款状态
+            this.timer = setInterval(async () => {
+                const res = await this.$axios({
+                    url: "/airorders/checkpay/",
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
+                    },
+                    data: {
+                        id: this.$route.query.id,
+                        nonce_str: this.order.price,
+                        out_trade_no: this.order.orderNo
+                    }
+                });
+
+            // 获取支付状态
+            const { stautusTxt } = res.data;
+            if(stautusTxt === "支付完成"){
+                this.$message.success(stautusTxt),
+                clearInterval(tihs.timer);
+            }
+        },3000);
+    }, 10);
+    },
+
+    // 组件销毁时候是启用
+    destroyed(){
+        clearInterval(this.timer);
+    }
+};
 </script>
 
 <style scoped lang="less">
